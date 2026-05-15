@@ -28,10 +28,18 @@
  ```
 /etc/init.d/rdks enable
 ```
-
 ## 🛠 How to build?
 [Generic Docs](https://867678.xyz/doc-build)
-
+> Additional notes:
+```
+cd sdk-root/package/rdks/root/etc/rustdesk
+rm DONOTREMOVE
+curl -LO "https://github.com/rustdesk/rustdesk-server/releases/download/1.1.15/rustdesk-server-linux-⚠️Rustdesk Arch.zip"
+unzip rustdesk-server-linux-⚠️Rustdesk Arch.zip
+rm rustdesk-server-linux-⚠️Rustdesk Arch.zip
+mv ⚠️Rustdesk Arch/* ./
+rm -rf ⚠️Rustdesk Arch/
+```
 ## ⚖️ License
 > Rustdesk-Server is an open source software with AGPL-3.0.
 >
