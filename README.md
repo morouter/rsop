@@ -6,7 +6,6 @@
 - It can be set as a daemon process and start automatically on boot.
 ## Commands
 - Once installed, it can be started with just one command.
-[How to install](https://867678.xyz/doc-install)
 - **Run**:
 ```
 /etc/init.d/rdks start
