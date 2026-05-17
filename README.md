@@ -28,7 +28,7 @@
 /etc/init.d/rdks enable
 ```
 ## 🛠 How to build?
-[Generic Docs](https://867678.xyz/doc-build)
+[Generic Docs](https://867678.xyz/doc/build)
 > Additional notes:
 ```
 cd sdk-root/package/rdks/root/etc/rustdesk
