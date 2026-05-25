@@ -1,5 +1,5 @@
 # rdks
-- Rustdesk Server for ImmortalWrt.
+Rustdesk Server for ImmortalWrt.
 ## 🚀 Features
 - Built-in latest version of Rustdesk-Server.
 - It can run smoothly with just a few lines of commands.
