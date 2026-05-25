@@ -45,3 +45,5 @@ rm -rf ⚠️Rustdesk Arch/
 ```
 ## ⚖️ License
 > This application under [GNU Affero Generic Public License Version 3](https://www.gnu.org/licenses/agpl-3.0.html)
+>
+> This Rustdesk-Server is refer <https://github.com/rustdesk/rustdesk-server>
