@@ -1,10 +1,12 @@
 # rdks
 Rustdesk Server for ImmortalWrt.
+## ⬇️ Downloads
+[GitHub Release](https://github.com/mokanove/rdks/releases)
 ## 🚀 Features
 - Built-in latest version of Rustdesk-Server.
 - It can run smoothly with just a few lines of commands.
 - It can be set as a daemon process and start automatically on boot.
-## Commands
+## ⚙ Commands
 - Once installed, it can be started with just one command.
 - **Run**:
 ```
@@ -28,7 +30,7 @@ Rustdesk Server for ImmortalWrt.
 /etc/init.d/rdks enable
 ```
 ## 🛠 How to build?
-[Generic Docs](https://867678.xyz/doc/build)
+[Generic Document](https://867678.xyz/doc/build)
 > Additional notes:
 ```
 cd sdk-root/package/rdks/root/etc/rustdesk
