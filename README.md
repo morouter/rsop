@@ -42,6 +42,4 @@ mv ⚠️Rustdesk Arch/* ./
 rm -rf ⚠️Rustdesk Arch/
 ```
 ## ⚖️ License
-> This application under [GNU Generic Public License Version 3](https://www.gnu.org/licenses/gpl-3.0.html)
-> 
-> Rustdesk-Server is an open source software with AGPL-3.0.[This Rustdesk-Server](github.com/rustdesk/rustdesk-server)
+> This application under [GNU Affero Generic Public License Version 3](https://www.gnu.org/licenses/agpl-3.0.html)
