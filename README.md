@@ -31,7 +31,9 @@ Rustdesk Server for ImmortalWrt.
 ```
 ## 🛠 How to build?
 [Generic Document](https://867678.xyz/doc/build)
-> Additional notes:
+> It is assumed that you are already in the SDK root directory.
+>
+> Additional operations are required on the source code:
 ```
 cd sdk-root/package/rdks/root/etc/rustdesk
 rm DONOTREMOVE
