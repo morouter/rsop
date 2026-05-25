@@ -44,4 +44,4 @@ rm -rf ⚠️Rustdesk Arch/
 ## ⚖️ License
 > This application by [Mo Public License](https://github.com/mokanove/mokanove/blob/main/docs/license.md)
 > 
-> Rustdesk-Server is an open source software with AGPL-3.0.
+> Rustdesk-Server is an open source software with AGPL-3.0.[This Rustdesk-Server](github.com/rustdesk/rustdesk-server)
