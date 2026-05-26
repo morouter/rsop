@@ -20,6 +20,10 @@ Rustdesk Server for ImmortalWrt.
 ```
 /etc/init.d/rdks status
 ```
+- **Show Rustdesk-Server Key**
+```
+cat /etc/rustdesk/id_ed25519.pub
+```
 - **Use the built-in utils to cheking the stats**:
 ```
 /etc/rustdesk/rustdesk-utils doctor localhost
