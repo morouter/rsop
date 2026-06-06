@@ -7,7 +7,6 @@ Rustdesk Server for ImmortalWrt.
 - It can run smoothly with just a few lines of commands.
 - It can be set as a daemon process and start automatically on boot.
 ## ⚙ Commands
-- Once installed, it can be started with just one command.
 - **Run**:
 ```
 /etc/init.d/rdks start
@@ -33,13 +32,13 @@ cat /etc/rustdesk/id_ed25519.pub
  ```
 /etc/init.d/rdks enable
 ```
-## 🛠 How to build?
+## 🛠 How to self-build
 [Generic Document](https://867678.xyz/doc/build)
 > It is assumed that you are already in the SDK root directory.
 >
 > Additional operations are required on the source code:
 ```
-cd sdk-root/package/rdks/root/etc/rustdesk
+cd ⚠️sdk-root/package/rdks/root/etc/rustdesk
 rm DONOTREMOVE
 curl -LO "https://github.com/rustdesk/rustdesk-server/releases/download/1.1.15/rustdesk-server-linux-⚠️Rustdesk Arch.zip"
 unzip rustdesk-server-linux-⚠️Rustdesk Arch.zip

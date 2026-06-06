@@ -18,20 +18,20 @@ jobs:
         include:
           - rustdesk_arch: "amd64"
             patch_arch: "x86_64"
-            sdk_name: "openwrt-sdk-25.12.4-x86-64_gcc-14.3.0_musl.Linux-x86_64"
+            sdk_name: "openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64"
           - rustdesk_arch: "arm64v8"
             patch_arch: "aarch64_generic"
-            sdk_name: "openwrt-sdk-25.12.4-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
+            sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
           - rustdesk_arch: "arm64v8"
             patch_arch: "aarch64_coretex-a53"
-            sdk_name: "openwrt-sdk-25.12.4-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64"
+            sdk_name: "openwrt-sdk-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64"
 
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@main
 
-      - name: Install Build Dependencies
-        uses: mokanove/mokanove/actions/luci-env@main
+      - name: Preparing build environment
+        uses: mokanove/mokanove/actions/build-env@main
 
       - name: Prepare SDK
         uses: mokanove/mokanove/actions/prepare-sdk@main
@@ -90,6 +90,8 @@ jobs:
             ${{ matrix.sdk_name }}/bin/packages/**/*.apk
           body: |
             # 📝 Release Notes
-            - The SDK has been upgraded to OpenWrt 25.12.4.
+            - Update SDK to SNAPSHOT
+            - Fix Makefile problem
+            # Fuck Rust and never use rust to coding!
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

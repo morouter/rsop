@@ -1,39 +1,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=rdks
-PKG_VERSION:=0.2.6
-PKG_RELEASE:=$(shell date +%Y%m%d%H%M%S)
+PKG_VERSION:=0.2.7
+PKG_RELEASE:=1
 PKG_LICENSE:=GPL-3.0
 
-LUCI_TITLE:=Rustdesk Server for immortalwrt
+LUCI_TITLE:=Rustdesk Server for ImmortalWrt
 LUCI_PKGARCH:=x86_64
 
-include $(INCLUDE_DIR)/package.mk
+include $(TOPDIR)/feeds/luci/luci.mk
 
-define Build/Prepare
-endef
-
-define Build/Configure
-endef
-
-define Build/Compile
-endef
-
-define Package/rdks
-  SECTION:=net
-  CATEGORY:=Network
-  TITLE:=Rustdesk Server for immortalwrt
-  PKGARCH:=x86_64
-endef
-
-define Package/rdks/install
-	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./root/etc/init.d/rdks $(1)/etc/init.d/rdks
-
-	$(INSTALL_DIR) $(1)/etc/rustdesk
-	$(INSTALL_BIN) ./root/etc/rustdesk/hbbs $(1)/etc/rustdesk/hbbs
-	$(INSTALL_BIN) ./root/etc/rustdesk/hbbr $(1)/etc/rustdesk/hbbr
-	$(INSTALL_BIN) ./root/etc/rustdesk/rustdesk-utils $(1)/etc/rustdesk/rustdesk-utils
-endef
-
-$(eval $(call BuildPackage,$(PKG_NAME)))
+# call BuildPackage - OpenWrt buildroot signature
