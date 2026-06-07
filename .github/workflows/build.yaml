@@ -63,6 +63,7 @@ jobs:
       - name: Set up RUST
         uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: master
           targets: ${{ matrix.target }}
 
       - name: Set up CROSS
@@ -77,6 +78,7 @@ jobs:
           cd rustdesk-server
           git checkout dependabot/submodules/master/libs/hbb_common-387603f
           git pull
+          export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
           cross build --release --target ${{ matrix.target }}
           ls
           exit 1
