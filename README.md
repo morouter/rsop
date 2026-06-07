@@ -6,6 +6,9 @@ Rustdesk Server for ImmortalWrt.
 - Built-in latest version of Rustdesk-Server.
 - It can run smoothly with just a few lines of commands.
 - It can be set as a daemon process and start automatically on boot.
+## ⚠️ Warning
+- **Only support aarch64 and amd64 CPU Arch**
+- **Only support OpenWrt Version 25.12 or later(using apk pm)**
 ## ⚙ Commands
 - **Run**:
 ```
@@ -32,9 +35,6 @@ cat /etc/rustdesk/id_ed25519.pub
  ```
 /etc/init.d/rdks enable
 ```
-## ⚠️ Warning
-- **Only support aarch64 and amd64 CPU Arch**
-- **Only support OpenWrt Version 25.12 or later(using apk pm)**
 ## 🛠 How to self-build
 [Generic Document](https://867678.xyz/doc/build)
 > It is assumed that you are already in the SDK root directory.
