@@ -1,5 +1,5 @@
-# rdks
-Rustdesk Server for ImmortalWrt.
+# rsop
+Rustdesk Server for OpenWrt.
 ## ⬇️ Downloads
 [GitHub Release](https://github.com/mokanove/rdks/releases)
 ## 🚀 Features

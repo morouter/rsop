@@ -10,8 +10,7 @@ jobs:
     name: Build for ${{ matrix.patch_arch }}
     runs-on: ubuntu-latest
     env:
-      project_name: "rdks"
-      rustdesk-server_version: "1.1.15"
+      project_name: "rsop"
     strategy:
       fail-fast: false
       matrix:
@@ -47,7 +46,7 @@ jobs:
       - name: Get Version
         id: get_version
         run: |
-          cd ${{ matrix.sdk_name }}/package/rdks
+          cd ${{ matrix.sdk_name }}/package/${{ env.project_name }}
           VERSION=$(grep -E "^PKG_VERSION[[:space:]]*:=" Makefile | sed -E 's/.*:=[[:space:]]*//' | tr -d '[:space:]')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -90,8 +89,8 @@ jobs:
             ${{ matrix.sdk_name }}/bin/packages/**/*.apk
           body: |
             # 📝 Release Notes
-            - Update SDK to SNAPSHOT
-            - Fix Makefile problem
-            # Fuck Rust and never use rust to coding!
+            - Rename project to rsop
+            - Using self-build binary and redevelopmenting go-rustdesk-server
+            # **Fuck Rust** and **never use rust to coding**!!!
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
