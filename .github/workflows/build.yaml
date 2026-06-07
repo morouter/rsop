@@ -61,7 +61,7 @@ jobs:
           fi
 
       - name: Set up RUST
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@master
         with:
           targets: ${{ matrix.target }}
 
@@ -73,7 +73,12 @@ jobs:
       - name: Build binary
         shell: bash
         run: |
+          git clone https://github.com/rustdesk/rustdesk-server.git
+          cd rustdesk-server
+          git checkout dependabot/submodules/master/libs/hbb_common-387603f
+          git pull
           cross build --release --target ${{ matrix.target }}
+          ls
           exit 1
 
       - name: Preparation before compilation
@@ -81,7 +86,6 @@ jobs:
         run: |
             cd ${{ matrix.sdk_name }}/package/${{ env.project_name }}/root/etc/rustdesk
             rm DONOTREMOVE
-
 
       - name: Build!
         uses: mokanove/mokanove/actions/build@main
