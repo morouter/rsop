@@ -63,7 +63,7 @@ jobs:
       - name: Set up RUST
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: master
+          toolchain: nightly
           targets: ${{ matrix.target }}
 
       - name: Set up CROSS
