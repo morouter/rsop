@@ -80,8 +80,12 @@ jobs:
           git pull
           git submodule update --init --recursive
           export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
-          cross build --release --target ${{ matrix.target }}
-          ls
+          export OPENSSL_STATIC=1
+          export OPENSSL_NO_VENDOR=0
+          export CARGO_BUILD_RUSTFLAGS="${RUSTFLAGS} --cfg openssl_vendored"
+          export OPENSSL_VENDORED=1
+          cross build --release --target ${{ matrix.target }} --bins
+          ls -al target/
           exit 1
 
       - name: Preparation before compilation
