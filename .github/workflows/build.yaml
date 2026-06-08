@@ -61,7 +61,7 @@ jobs:
         run: |
             cd ${{ matrix.sdk_name }}/package/${{ env.project_name }}/root/etc/rustdesk
             rm DONOTREMOVE
-            wget -O go-rustdesk-server "https://github.com/mokanove/rsop/releases/latest/download/go-rustdesk-server-linux-${{ matrix.tags }}"
+            wget -O go-rustdesk-server "https://github.com/mokanove/go-rustdesk-server/releases/latest/download/go-rustdesk-server-linux-${{ matrix.tags }}"
 
       - name: Build!
         uses: mokanove/mokanove/actions/build@main
