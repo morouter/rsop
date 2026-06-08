@@ -81,8 +81,7 @@ jobs:
           cat >> Cargo.toml << 'EOF'
           [patch.crates-io]
           openssl = { version = "0.10", features = ["vendored"] }
-          EOF
-          cat > Cross.toml << 'EOF'
+
           [target.x86_64-unknown-linux-musl]
           pre-build = [
             "apt-get update && apt-get install -y cmake perl pkg-config musl-tools"
@@ -93,7 +92,8 @@ jobs:
            "apt-get update && apt-get install -y cmake perl pkg-config musl-tools gcc-aarch64-linux-gnu"
           ]
           EOF
-
+          cross metadata --format-version 1 --target ${{ matrix.target }} 2>&1 || true
+          cargo metadata --format-version 1 2>&1 | head -5 || true
           export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
           cross build --release --target ${{ matrix.target }} --bins
           ls -al target/
