@@ -41,11 +41,11 @@ jobs:
       - name: Build binary
         shell: bash
         env:
-        DEBIAN_FRONTEND: noninteractive
-        OPENSSL_STATIC: "1"
-        OPENSSL_VENDORED: "1"
-        CROSS_NO_WARNINGS: "0"
-        run: |
+          DEBIAN_FRONTEND: noninteractive
+          OPENSSL_STATIC: "1"
+          OPENSSL_VENDORED: "1"
+          CROSS_NO_WARNINGS: "0"
+          run: |
           git clone https://github.com/rustdesk/rustdesk-server.git
           cd rustdesk-server
           git checkout dependabot/submodules/master/libs/hbb_common-387603f
@@ -53,37 +53,27 @@ jobs:
           git submodule update --init --recursive
 
           cat > Cross.toml << 'EOF'
-           [target.x86_64-unknown-linux-musl]
-            pre-build = [
-            "ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime",
-            "echo 'tzdata tzdata/Areas select Asia' | debconf-set-selections",
-            "echo 'tzdata tzdata/Zones/Asia select Shanghai' | debconf-set-selections",
-            "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev tzdata"
-            ]
-            [target.x86_64-unknown-linux-musl.env]
-            passthrough = [
-            "DEBIAN_FRONTEND",
-            "OPENSSL_STATIC",
-            "OPENSSL_VENDORED",
-            ]
+          [target.x86_64-unknown-linux-musl]
+          pre-build = [
+            "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",
+            "echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections",
+            "echo 'tzdata tzdata/Zones/Etc select UTC' | debconf-set-selections",
+            "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"
+          ]
+          [target.x86_64-unknown-linux-musl.env]
+          passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]
 
-            [target.aarch64-unknown-linux-musl]
-            pre-build = [
-            "ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime",
-            "echo 'tzdata tzdata/Areas select Asia' | debconf-set-selections",
-            "echo 'tzdata tzdata/Zones/Asia select Shanghai' | debconf-set-selections",
-            "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev tzdata"
-            ]
-            [target.aarch64-unknown-linux-musl.env]
-            passthrough = [
-            "DEBIAN_FRONTEND",
-            "OPENSSL_STATIC",
-            "OPENSSL_VENDORED",
-            ]
-            EOF
+          [target.aarch64-unknown-linux-musl]
+          pre-build = [
+            "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",
+            "echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections",
+            "echo 'tzdata tzdata/Zones/Etc select UTC' | debconf-set-selections",
+            "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"
+          ]
+          [target.aarch64-unknown-linux-musl.env]
+          passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]
+          EOF
 
           export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
-
           cross build --release --target ${{ matrix.target }} --bins
           ls -al target/${{ matrix.target }}/release/
-          exit 1
