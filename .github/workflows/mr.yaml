@@ -40,6 +40,11 @@ jobs:
 
       - name: Build binary
         shell: bash
+        env:
+        DEBIAN_FRONTEND: noninteractive
+        OPENSSL_STATIC: "1"
+        OPENSSL_VENDORED: "1"
+        CROSS_NO_WARNINGS: "0"
         run: |
           git clone https://github.com/rustdesk/rustdesk-server.git
           cd rustdesk-server
@@ -49,31 +54,34 @@ jobs:
 
           cat > Cross.toml << 'EOF'
            [target.x86_64-unknown-linux-musl]
-           pre-build = [
-            "apt-get update && apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"
-           ]
-           [target.x86_64-unknown-linux-musl.env]
-           passthrough = [
+            pre-build = [
+            "ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime",
+            "echo 'tzdata tzdata/Areas select Asia' | debconf-set-selections",
+            "echo 'tzdata tzdata/Zones/Asia select Shanghai' | debconf-set-selections",
+            "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev tzdata"
+            ]
+            [target.x86_64-unknown-linux-musl.env]
+            passthrough = [
+            "DEBIAN_FRONTEND",
             "OPENSSL_STATIC",
             "OPENSSL_VENDORED",
-            "OPENSSL_NO_VENDOR",
-          ]
+            ]
 
-          [target.aarch64-unknown-linux-musl]
-          pre-build = [
-          "apt-get update && apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"
-          ]
-          [target.aarch64-unknown-linux-musl.env]
-          passthrough = [
+            [target.aarch64-unknown-linux-musl]
+            pre-build = [
+            "ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime",
+            "echo 'tzdata tzdata/Areas select Asia' | debconf-set-selections",
+            "echo 'tzdata tzdata/Zones/Asia select Shanghai' | debconf-set-selections",
+            "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev tzdata"
+            ]
+            [target.aarch64-unknown-linux-musl.env]
+            passthrough = [
+            "DEBIAN_FRONTEND",
             "OPENSSL_STATIC",
             "OPENSSL_VENDORED",
-            "OPENSSL_NO_VENDOR",
-          ]
-          EOF
+            ]
+            EOF
 
-          export OPENSSL_STATIC=1
-          export OPENSSL_VENDORED=1
-          export CROSS_NO_WARNINGS=0
           export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
 
           cross build --release --target ${{ matrix.target }} --bins
