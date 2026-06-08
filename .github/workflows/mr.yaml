@@ -1,5 +1,4 @@
-name : NEVER USING RUST
-
+name: NEVER USING RUST
 on:
   workflow_dispatch:
 permissions:
@@ -22,22 +21,17 @@ jobs:
             release-name: "aarch64-linux-musl"
             patch_arch: "aarch64_generic"
             sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
-
     steps:
       - name: Checkout
         uses: actions/checkout@main
-
       - name: Set up RUST
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
           targets: ${{ matrix.target }}
-
       - name: Set up CROSS
         shell: bash
-        run: |
-          cargo install cross --git https://github.com/cross-rs/cross
-
+        run: cargo install cross --git https://github.com/cross-rs/cross
       - name: Build binary
         shell: bash
         env:
@@ -45,35 +39,29 @@ jobs:
           OPENSSL_STATIC: "1"
           OPENSSL_VENDORED: "1"
           CROSS_NO_WARNINGS: "0"
-          run: |
+        run: |
           git clone https://github.com/rustdesk/rustdesk-server.git
           cd rustdesk-server
           git checkout dependabot/submodules/master/libs/hbb_common-387603f
           git pull
           git submodule update --init --recursive
-
-          cat > Cross.toml << 'EOF'
-          [target.x86_64-unknown-linux-musl]
-          pre-build = [
-            "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",
-            "echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections",
-            "echo 'tzdata tzdata/Zones/Etc select UTC' | debconf-set-selections",
-            "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"
-          ]
-          [target.x86_64-unknown-linux-musl.env]
-          passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]
-
-          [target.aarch64-unknown-linux-musl]
-          pre-build = [
-            "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",
-            "echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections",
-            "echo 'tzdata tzdata/Zones/Etc select UTC' | debconf-set-selections",
-            "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"
-          ]
-          [target.aarch64-unknown-linux-musl.env]
-          passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]
-          EOF
-
+          printf '%s\n' \
+            '[target.x86_64-unknown-linux-musl]' \
+            'pre-build = [' \
+            '  "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",' \
+            '  "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"' \
+            ']' \
+            '[target.x86_64-unknown-linux-musl.env]' \
+            'passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]' \
+            '' \
+            '[target.aarch64-unknown-linux-musl]' \
+            'pre-build = [' \
+            '  "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",' \
+            '  "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"' \
+            ']' \
+            '[target.aarch64-unknown-linux-musl.env]' \
+            'passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]' \
+            > Cross.toml
           export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
           cross build --release --target ${{ matrix.target }} --bins
           ls -al target/${{ matrix.target }}/release/
