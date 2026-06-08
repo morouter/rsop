@@ -10,64 +10,39 @@ jobs:
     env:
       project_name: "rsop"
     strategy:
-      fail-fast: false
       matrix:
         include:
-          - target: "x86_64-unknown-linux-musl"
-            release-name: "x86_64-linux-musl"
-            patch_arch: "x86_64"
-            sdk_name: "openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64"
-          - target: "aarch64-unknown-linux-musl"
-            release-name: "aarch64-linux-musl"
-            patch_arch: "aarch64_generic"
-            sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
+          - target: x86_64-unknown-linux-musl
+            runs-on: ubuntu-latest
+          - target: aarch64-unknown-linux-musl
+            runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@main
-      - name: Set up RUST
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: nightly
-          targets: ${{ matrix.target }}
-      - name: Set up CROSS
-        shell: bash
-        run: cargo install cross --git https://github.com/cross-rs/cross
-      - name: Build binary
-        shell: bash
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            pkg-config libssl-dev libsodium-dev \
+            libsqlite3-dev musl-tools cmake perl
+
+      - name: Install Rust target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Build x86_64
+        if: matrix.target == 'x86_64-unknown-linux-musl'
         env:
-          DEBIAN_FRONTEND: noninteractive
           OPENSSL_STATIC: "1"
           OPENSSL_VENDORED: "1"
-          CROSS_NO_WARNINGS: "0"
         run: |
-          git clone https://github.com/rustdesk/rustdesk-server.git
           cd rustdesk-server
-          git checkout dependabot/submodules/master/libs/hbb_common-387603f
-          git pull
-          git submodule update --init --recursive
+          cargo build --release --target x86_64-unknown-linux-musl --bins
 
-          printf '%s\n' \
-            '[target.x86_64-unknown-linux-musl]' \
-            'pre-build = [' \
-            '  "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config libsodium-dev libsqlite3-dev wget",' \
-            '  "wget -q https://www.openssl.org/source/openssl-3.0.13.tar.gz && tar xf openssl-3.0.13.tar.gz",' \
-            '  "cd openssl-3.0.13 && ./Configure linux-x86_64 --prefix=/usr --openssldir=/usr/lib/ssl no-shared && make -j4 && make install_sw && make install_ssldirs",' \
-            '  "rm -rf openssl-3.0.13 openssl-3.0.13.tar.gz",' \
-            '  "pkg-config --libs openssl && echo PKG_CONFIG_OK"' \
-            ']' \
-            '' \
-            '[target.aarch64-unknown-linux-musl]' \
-            'pre-build = [' \
-            '  "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config libsodium-dev libsqlite3-dev wget gcc-aarch64-linux-gnu",' \
-            '  "wget -q https://www.openssl.org/source/openssl-3.0.13.tar.gz && tar xf openssl-3.0.13.tar.gz",' \
-            '  "cd openssl-3.0.13 && ./Configure linux-aarch64 --prefix=/usr --openssldir=/usr/lib/ssl no-shared --cross-compile-prefix=aarch64-linux-gnu- && make -j4 && make install_sw && make install_ssldirs",' \
-            '  "rm -rf openssl-3.0.13 openssl-3.0.13.tar.gz",' \
-            '  "pkg-config --libs openssl && echo PKG_CONFIG_OK"' \
-            ']' \
-            > Cross.toml
-
-          cat Cross.toml
-
-          export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
-          cross build --release --target ${{ matrix.target }} --bins
-          ls -al target/${{ matrix.target }}/release/
+      - name: Build aarch64
+        if: matrix.target == 'aarch64-unknown-linux-musl'
+        run: |
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          cd rustdesk-server
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-gnu-gcc \
+          OPENSSL_STATIC=1 \
+          OPENSSL_VENDORED=1 \
+          cargo build --release --target aarch64-unknown-linux-musl --bins
