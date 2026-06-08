@@ -1,0 +1,81 @@
+name : NEVER USING RUST
+
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    name: Build for ${{ matrix.patch_arch }}
+    runs-on: ubuntu-latest
+    env:
+      project_name: "rsop"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: "x86_64-unknown-linux-musl"
+            release-name: "x86_64-linux-musl"
+            patch_arch: "x86_64"
+            sdk_name: "openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64"
+          - target: "aarch64-unknown-linux-musl"
+            release-name: "aarch64-linux-musl"
+            patch_arch: "aarch64_generic"
+            sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Set up RUST
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly
+          targets: ${{ matrix.target }}
+
+      - name: Set up CROSS
+        shell: bash
+        run: |
+          cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build binary
+        shell: bash
+        run: |
+          git clone https://github.com/rustdesk/rustdesk-server.git
+          cd rustdesk-server
+          git checkout dependabot/submodules/master/libs/hbb_common-387603f
+          git pull
+          git submodule update --init --recursive
+
+          cat > Cross.toml << 'EOF'
+           [target.x86_64-unknown-linux-musl]
+           pre-build = [
+            "apt-get update && apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"
+           ]
+           [target.x86_64-unknown-linux-musl.env]
+           passthrough = [
+            "OPENSSL_STATIC",
+            "OPENSSL_VENDORED",
+            "OPENSSL_NO_VENDOR",
+          ]
+
+          [target.aarch64-unknown-linux-musl]
+          pre-build = [
+          "apt-get update && apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"
+          ]
+          [target.aarch64-unknown-linux-musl.env]
+          passthrough = [
+            "OPENSSL_STATIC",
+            "OPENSSL_VENDORED",
+            "OPENSSL_NO_VENDOR",
+          ]
+          EOF
+
+          export OPENSSL_STATIC=1
+          export OPENSSL_VENDORED=1
+          export CROSS_NO_WARNINGS=0
+          export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
+
+          cross build --release --target ${{ matrix.target }} --bins
+          ls -al target/${{ matrix.target }}/release/
+          exit 1

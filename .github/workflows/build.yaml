@@ -1,7 +1,6 @@
 name : Y to', to', to' lo que tu quieres de mi
 
 on:
-  push:
   workflow_dispatch:
 permissions:
   contents: write
