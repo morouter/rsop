@@ -49,7 +49,7 @@ jobs:
             '[target.x86_64-unknown-linux-musl]' \
             'pre-build = [' \
             '  "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",' \
-            '  "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"' \
+            '  "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config libsodium-dev libsqlite3-dev"' \
             ']' \
             '[target.x86_64-unknown-linux-musl.env]' \
             'passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]' \
@@ -57,7 +57,7 @@ jobs:
             '[target.aarch64-unknown-linux-musl]' \
             'pre-build = [' \
             '  "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",' \
-            '  "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config musl-tools libsodium-dev libsqlite3-dev"' \
+            '  "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config libsodium-dev libsqlite3-dev"' \
             ']' \
             '[target.aarch64-unknown-linux-musl.env]' \
             'passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]' \
