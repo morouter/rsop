@@ -17,12 +17,10 @@ jobs:
         include:
           - target: "x86_64-unknown-linux-musl"
             release-name: "x86_64-linux-musl"
-            tool: "cross"
             patch_arch: "x86_64"
             sdk_name: "openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64"
           - target: "aarch64-unknown-linux-musl"
             release-name: "aarch64-linux-musl"
-            tool: "cross"
             patch_arch: "aarch64_generic"
             sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
 
@@ -79,12 +77,20 @@ jobs:
           git checkout dependabot/submodules/master/libs/hbb_common-387603f
           git pull
           git submodule update --init --recursive
+          cat > Cross.toml << 'EOF'
+          [target.x86_64-unknown-linux-musl]
+          pre-build = [
+           "apt update && apt install -y pkg-config libssl-dev libsodium-dev libsqlite3-dev"
+          ]
+
+          [target.aarch64-unknown-linux-musl]
+          pre-build = [
+            "dpkg --add-architecture arm64",
+            "apt update && apt install -y pkg-config libssl-dev:arm64 libsodium-dev:arm64 libsqlite3-dev:arm64"
+          ]
+          EOF
           export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
-          export OPENSSL_STATIC=1
-          export OPENSSL_NO_VENDOR=0
-          export CARGO_BUILD_RUSTFLAGS="${RUSTFLAGS} --cfg openssl_vendored"
-          export OPENSSL_VENDORED=1
-          cross build --release --target ${{ matrix.target }} --bins
+          cross build --release --target ${{ matrix.target }}
           ls -al target/
           exit 1
 
