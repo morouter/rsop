@@ -1,6 +1,7 @@
-name : Y to', to', to' lo que tu quieres de mi
+name : I go to Comicon, guns, and thrash metal shows
 
 on:
+  push:
   workflow_dispatch:
 permissions:
   contents: write
@@ -14,12 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: "x86_64-unknown-linux-musl"
-            release-name: "x86_64-linux-musl"
+          - tags: "amd64-musl"
             patch_arch: "x86_64"
             sdk_name: "openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64"
-          - target: "aarch64-unknown-linux-musl"
-            release-name: "aarch64-linux-musl"
+          - tags: "arm64-musl"
             patch_arch: "aarch64_generic"
             sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
 
@@ -57,52 +56,12 @@ jobs:
             sed -i 's/x86_64/${{ matrix.patch_arch }}/g' ./Makefile
           fi
 
-      - name: Set up RUST
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: nightly
-          targets: ${{ matrix.target }}
-
-      - name: Set up CROSS
-        shell: bash
-        run: |
-          cargo install cross --git https://github.com/cross-rs/cross
-
-      - name: Build binary
-        shell: bash
-        run: |
-          git clone https://github.com/rustdesk/rustdesk-server.git
-          cd rustdesk-server
-          git checkout dependabot/submodules/master/libs/hbb_common-387603f
-          git pull
-          git submodule update --init --recursive
-
-          cat >> Cargo.toml << 'EOF'
-          [patch.crates-io]
-          openssl = { version = "0.10", features = ["vendored"] }
-
-          [target.x86_64-unknown-linux-musl]
-          pre-build = [
-            "apt-get update && apt-get install -y cmake perl pkg-config musl-tools"
-          ]
-
-          [target.aarch64-unknown-linux-musl]
-          pre-build = [
-           "apt-get update && apt-get install -y cmake perl pkg-config musl-tools gcc-aarch64-linux-gnu"
-          ]
-          EOF
-          cross metadata --format-version 1 --target ${{ matrix.target }} 2>&1 || true
-          cargo metadata --format-version 1 2>&1 | head -5 || true
-          export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
-          cross build --release --target ${{ matrix.target }} --bins
-          ls -al target/
-          exit 1
-
       - name: Preparation before compilation
         shell: bash
         run: |
             cd ${{ matrix.sdk_name }}/package/${{ env.project_name }}/root/etc/rustdesk
             rm DONOTREMOVE
+            wget -O go-rustdesk-server "https://github.com/mokanove/rsop/releases/latest/download/go-rustdesk-server-linux-${{ matrix.tags }}"
 
       - name: Build!
         uses: mokanove/mokanove/actions/build@main
@@ -124,7 +83,7 @@ jobs:
           body: |
             # 📝 Release Notes
             - Rename project to rsop
-            - Using self-build binary and redevelopmenting go-rustdesk-server
+            - Using self-redevelopment go-rustdesk-server
             - Remove aarch64_coretex-a53 support
             # **Fuck Rust** and **never use rust to coding**!!!
         env:
