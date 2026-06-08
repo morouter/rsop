@@ -28,21 +28,15 @@ jobs:
       - name: Install Rust target
         run: rustup target add ${{ matrix.target }}
 
-      - name: Build x86_64
-        if: matrix.target == 'x86_64-unknown-linux-musl'
+      - name: Build binary
         env:
           OPENSSL_STATIC: "1"
           OPENSSL_VENDORED: "1"
         run: |
+          git clone https://github.com/rustdesk/rustdesk-server.git
           cd rustdesk-server
-          cargo build --release --target x86_64-unknown-linux-musl --bins
-
-      - name: Build aarch64
-        if: matrix.target == 'aarch64-unknown-linux-musl'
-        run: |
-          sudo apt-get install -y gcc-aarch64-linux-gnu
-          cd rustdesk-server
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-gnu-gcc \
-          OPENSSL_STATIC=1 \
-          OPENSSL_VENDORED=1 \
-          cargo build --release --target aarch64-unknown-linux-musl --bins
+          git checkout dependabot/submodules/master/libs/hbb_common-387603f
+          git pull
+          git submodule update --init --recursive
+          cargo build --release --target ${{ matrix.target }} --bins
+          ls -al target/${{ matrix.target }}/release/
