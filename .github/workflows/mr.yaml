@@ -48,20 +48,34 @@ jobs:
           printf '%s\n' \
             '[target.x86_64-unknown-linux-musl]' \
             'pre-build = [' \
-            '  "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",' \
-            '  "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config libsodium-dev libsqlite3-dev"' \
+            '  "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config libsodium-dev libsqlite3-dev wget",' \
+            '  "wget -q https://www.openssl.org/source/openssl-3.0.13.tar.gz && tar xf openssl-3.0.13.tar.gz",' \
+            '  "cd openssl-3.0.13 && ./Configure linux-x86_64 --prefix=/usr/local/openssl-musl no-shared && make -j$(nproc) && make install_sw",' \
+            '  "rm -rf openssl-3.0.13 openssl-3.0.13.tar.gz"' \
             ']' \
             '[target.x86_64-unknown-linux-musl.env]' \
-            'passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]' \
+            'passthrough = ["DEBIAN_FRONTEND"]' \
+            'volumes = ["/usr/local/openssl-musl"]' \
+            '' \
+            '[target.x86_64-unknown-linux-musl.env.set]' \
+            'OPENSSL_STATIC = "1"' \
+            'OPENSSL_DIR = "/usr/local/openssl-musl"' \
             '' \
             '[target.aarch64-unknown-linux-musl]' \
             'pre-build = [' \
-            '  "ln -fs /usr/share/zoneinfo/UTC /etc/localtime",' \
-            '  "DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config libsodium-dev libsqlite3-dev"' \
+            '  "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y cmake perl pkg-config libsodium-dev libsqlite3-dev wget gcc-aarch64-linux-gnu",' \
+            '  "wget -q https://www.openssl.org/source/openssl-3.0.13.tar.gz && tar xf openssl-3.0.13.tar.gz",' \
+            '  "cd openssl-3.0.13 && ./Configure linux-aarch64 --prefix=/usr/local/openssl-musl no-shared --cross-compile-prefix=aarch64-linux-gnu- && make -j$(nproc) && make install_sw",' \
+            '  "rm -rf openssl-3.0.13 openssl-3.0.13.tar.gz"' \
             ']' \
             '[target.aarch64-unknown-linux-musl.env]' \
-            'passthrough = ["OPENSSL_STATIC", "OPENSSL_VENDORED", "DEBIAN_FRONTEND"]' \
+            'passthrough = ["DEBIAN_FRONTEND"]' \
+            '' \
+            '[target.aarch64-unknown-linux-musl.env.set]' \
+            'OPENSSL_STATIC = "1"' \
+            'OPENSSL_DIR = "/usr/local/openssl-musl"' \
             > Cross.toml
+          export DEBIAN_FRONTEND=noninteractive
           export RUSTFLAGS="-C opt-level=3 -C codegen-units=1"
           cross build --release --target ${{ matrix.target }} --bins
           ls -al target/${{ matrix.target }}/release/
