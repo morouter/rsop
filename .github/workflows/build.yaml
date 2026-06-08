@@ -78,8 +78,7 @@ jobs:
         uses: softprops/action-gh-release@master
         with:
           tag_name: V${{ steps.get_version.outputs.version }}
-          files: |
-            $GITHUB_WORKSPACE/*.apk
+          files: ${{ github.workspace }}/*.apk
           body: |
             # 📝 Release Notes
             - Rename project to rsop
