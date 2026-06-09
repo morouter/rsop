@@ -9,10 +9,7 @@ GORS_BIN="/etc/rustdesk/go-rustdesk-server"
 
 start_service() {
     procd_open_instance "go-rustdesk-server"
-
-    procd_set_param command "$GORS_BIN"
-    procd_set_param cwd "$DATA_DIR"
-
+    procd_set_param command sh -c "cd '$DATA_DIR' && exec '$GORS_BIN'"
     procd_set_param respawn 3600 3 3
     procd_set_param stdout 1
     procd_set_param stderr 1

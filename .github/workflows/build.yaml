@@ -70,6 +70,13 @@ jobs:
           files: rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
           body: |
             # 📝 Release Notes
-            - Some action change
+            - The issue of root directory positioning offset has been fixed.
+            # ⚠️ WARNING:
+            > If you are upgrading this version from rdks or a version lower than rsop V0.3.1.
+            >
+            > Please execute the following command before installing this version:
+            ```
+            rm -rf /etc/rustdesk
+            ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
