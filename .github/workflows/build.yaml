@@ -28,13 +28,6 @@ jobs:
         with:
           path: ${{ env.project_name }}
 
-      - name: Get Version
-        id: get_version
-        shell: bash
-        run: |
-          cd ${{ env.project_name }}
-
-
       - name: Preparing build environment
         uses: mokanove/mokanove/actions/build-env@main
 
