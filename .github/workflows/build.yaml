@@ -61,7 +61,7 @@ jobs:
       - name: Rename compilation files
         shell: bash
         run: |
-          mv ${{ matrix.sdk_name }}/bin/packages/**/rsop* rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
+          mv ${{ matrix.sdk_name }}/bin/packages/*/base/*.apk rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
 
       - name: Release
         uses: softprops/action-gh-release@master
