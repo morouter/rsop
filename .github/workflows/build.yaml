@@ -82,6 +82,6 @@ jobs:
           files: ${{ github.workspace }}/*.apk
           body: |
             # 📝 Release Notes
-            - Fixed the issue of insufficient permissions for go-rustdesk-server.
+            - Update go-rustdesk-server to latest version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
