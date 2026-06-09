@@ -25,6 +25,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
+        with:
+          path: ${{ env.project_name }}
+
+      - name: Get Version
+        id: get_version
+        shell: bash
+        run: |
+          cd ${{ env.project_name }}
+          VERSION=$(grep -E "^PKG_VERSION[[:space:]]*:=" Makefile | sed -E 's/.*:=[[:space:]]*//' | tr -d '[:space:]')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Preparing build environment
         uses: mokanove/mokanove/actions/build-env@main
@@ -34,54 +44,38 @@ jobs:
         with:
           sdk_name: ${{ matrix.sdk_name }}
 
-      - name: Clone Source Code
-        uses: mokanove/mokanove/actions/clone@main
-        with:
-          sdk_name: ${{ matrix.sdk_name }}
-          project_name: ${{ env.project_name }}
-
-      - name: Get Version
-        id: get_version
+      - name: Preparation before compilation
         shell: bash
         run: |
-          cd ${{ matrix.sdk_name }}/package/${{ env.project_name }}
-          VERSION=$(grep -E "^PKG_VERSION[[:space:]]*:=" Makefile | sed -E 's/.*:=[[:space:]]*//' | tr -d '[:space:]')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Change Arch
-        shell: bash
-        run: |
+          mv ${{ env.project_name }} ${{ matrix.sdk_name }}/package/
           cd ${{ matrix.sdk_name }}/package/${{ env.project_name }}
           if [ "${{ matrix.patch_arch }}" != "x86_64" ]; then
             sed -i 's/x86_64/${{ matrix.patch_arch }}/g' ./Makefile
           fi
-
-      - name: Preparation before compilation
-        shell: bash
-        run: |
-            cd ${{ matrix.sdk_name }}/package/${{ env.project_name }}/root/etc/rustdesk
-            rm DONOTREMOVE
-            wget -O go-rustdesk-server "https://github.com/mokanove/go-rustdesk-server/releases/latest/download/go-rustdesk-server-linux-${{ matrix.tags }}"
-            chmod +x ./go-rustdesk-server
+          cd $GITHUB_WORKSPACE
+          cd ${{ matrix.sdk_name }}/package/${{ env.project_name }}/root/etc/rustdesk
+          rm DONOTREMOVE
+          wget -O go-rustdesk-server "https://github.com/mokanove/go-rustdesk-server/releases/latest/download/go-rustdesk-server-linux-${{ matrix.tags }}"
+          chmod +x ./go-rustdesk-server
 
       - name: Build!
-        uses: mokanove/mokanove/actions/build@main
-        with:
-          sdk_name: ${{ matrix.sdk_name }}
-          project_name: ${{ env.project_name }}
+        shell: bash
+        run: |
+          cd ${{ matrix.sdk_name }}
+          make package/${{ env.project_name }}/compile V=s -j$(nproc)
 
       - name: Rename compilation files
         shell: bash
         run: |
-            mv ${{ matrix.sdk_name }}/bin/packages/*/base/rsop* $GITHUB_WORKSPACE/rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
+          mv ${{ matrix.sdk_name }}/bin/packages/${{ matrix.patch_arch }}/base/rsop* ${{ matrix.sdk_name }}/bin/packages/${{ matrix.patch_arch }}/base/rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
 
       - name: Release
         uses: softprops/action-gh-release@master
         with:
           tag_name: V${{ steps.get_version.outputs.version }}
-          files: ${{ github.workspace }}/*.apk
+          files: ${{ matrix.sdk_name }}/bin/packages/${{ matrix.patch_arch }}/base/*.apk
           body: |
             # 📝 Release Notes
-            - Update go-rustdesk-server to latest version
+            - Some action change
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
