@@ -81,9 +81,6 @@ jobs:
           files: ${{ github.workspace }}/*.apk
           body: |
             # 📝 Release Notes
-            - Rename project to rsop
-            - Using self-redevelopment go-rustdesk-server
-            - Remove aarch64_coretex-a53 support
-            # **Fuck Rust** and **never use rust to coding**!!!
+            - The go-rustdesk-server be upgraded
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
