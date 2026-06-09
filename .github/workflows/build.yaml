@@ -73,7 +73,7 @@ jobs:
         uses: softprops/action-gh-release@master
         with:
           tag_name: V${{ steps.get_version.outputs.version }}
-          files: *.apk
+          files: rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
           body: |
             # 📝 Release Notes
             - Some action change
