@@ -70,7 +70,7 @@ jobs:
           files: rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
           body: |
             # 📝 Release Notes
-            - The issue of root directory positioning offset has been fixed.
+            - The go-rustdesk-server has been upgraded.
             # ⚠️ WARNING:
             > If you are upgrading this version from rdks or a version lower than rsop V0.3.1.
             >
