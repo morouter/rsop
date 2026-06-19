@@ -54,6 +54,8 @@ jobs:
           wget -O go-rustdesk-server https://github.com/mokanove/go-rustdesk-server/releases/download/V2.1.6/go-rustdesk-server-linux-${{ matrix.gordks_tag }}
           chmod +x ./go-rustdesk-server
           wget -O rustdesk-server.zip https://github.com/rustdesk/rustdesk-server/releases/download/1.1.15/rustdesk-server-linux-${{ matrix.rdks_tag }}.zip
+          sudo apt-get update
+          sudo apt-get install unzip -y
           unzip ./rustdesk-server.zip
           mv ./${{ matrix.rdks_tag }}/* ./
           rm -rf ./${{ matrix.rdks_tag }}
@@ -79,6 +81,6 @@ jobs:
           files: rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
           body: |
             # 📝 Release Note
-            - Change binary to rustdesk-server offical
+            - Fixes and improvements
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
