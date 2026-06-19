@@ -57,7 +57,9 @@ jobs:
           unzip ./rustdesk-server.zip
           mv ./${{ matrix.rdks_tag }}/* ./
           rm -rf ./${{ matrix.rdks_tag }}
-          chmod +x ./hbbr ./hbbs ./rustdesk-utils
+          chmod +x ./hbbr
+          chmod +x ./hbbs
+          chmod +x ./rustdesk-utils
 
       - name: Build!
         shell: bash
