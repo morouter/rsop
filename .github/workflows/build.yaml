@@ -15,10 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - tags: "amd64-musl"
+          - gordks_tag: "amd64-musl"
+            rdks_tag: "amd64"
             patch_arch: "x86_64"
             sdk_name: "openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64"
-          - tags: "arm64-musl"
+          - gordks_tag: "arm64-musl"
+            rdks_tag: "arm64v8"
             patch_arch: "aarch64_generic"
             sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
 
@@ -49,8 +51,13 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           cd $GITHUB_WORKSPACE/${{ matrix.sdk_name }}/package/${{ env.project_name }}/root/etc/rustdesk
           rm DONOTREMOVE
-          wget -O go-rustdesk-server "https://github.com/mokanove/go-rustdesk-server/releases/latest/download/go-rustdesk-server-linux-${{ matrix.tags }}"
+          wget -O go-rustdesk-server https://github.com/mokanove/go-rustdesk-server/releases/download/V2.1.6/go-rustdesk-server-linux-${{ matrix.gordks_tag }}
           chmod +x ./go-rustdesk-server
+          wget -O rustdesk-server.zip https://github.com/rustdesk/rustdesk-server/releases/download/1.1.15/rustdesk-server-linux-${{ matrix.rdks_tag }}.zip
+          unzip ./rustdesk-server.zip
+          mv ./{{ matrix.rdks_tag }}/* ./
+          rm -rf ./{{ matrix.rdks_tag }}
+          chmod +x ./hbbr ./hbbs ./rustdesk-utils
 
       - name: Build!
         shell: bash
@@ -69,14 +76,7 @@ jobs:
           tag_name: V${{ steps.get_version.outputs.version }}
           files: rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
           body: |
-            # 📝 Release Notes
-            - The go-rustdesk-server has been upgraded.
-            # ⚠️ WARNING:
-            > If you are upgrading this version from rdks or a version lower than rsop V0.3.1.
-            >
-            > Please execute the following command before installing this version:
-            ```
-            rm -rf /etc/rustdesk
-            ```
+            # 📝 Release Note
+            - Change binary to rustdesk-server offical
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
