@@ -1,6 +1,5 @@
 # rsop
-Rustdesk Server for OpenWrt.
-# We Moved to <https://github.com/mokanove/go-rustdesk-server> and So Rustdesk Fuck you!
+> Rustdesk Server for OpenWrt
 ## ⬇️ Downloads
 [GitHub Release](https://github.com/mokanove/rsop/releases)
 ## 🚀 Features
