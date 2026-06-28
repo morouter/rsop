@@ -56,15 +56,17 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           cd $GITHUB_WORKSPACE/${{ matrix.sdk_name }}/package/${{ env.project_name }}
           CGO_ENABLED=0 GOARCH=${{ matrix.goarch }} go build
+          mv ./rsop root/etc/rustdesk/rsop
           cd root/etc/rustdesk
           rm DONOTREMOVE
           wget -O rustdesk-server.zip https://github.com/rustdesk/rustdesk-server/releases/latest/download/rustdesk-server-linux-${{ matrix.rdks_tag }}.zip
           unzip ./rustdesk-server.zip
           mv ./${{ matrix.rdks_tag }}/* ./
-          rm -rf ./${{ matrix.rdks_tag }}
+          rm -rf ./${{ matrix.rdks_tag }} ./rustdesk-server.zip
           chmod +x ./hbbr
           chmod +x ./hbbs
           chmod +x ./rustdesk-utils
+          chmod +x ./rsop
 
       - name: Build!
         shell: bash
