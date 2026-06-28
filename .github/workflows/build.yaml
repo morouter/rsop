@@ -16,9 +16,11 @@ jobs:
       matrix:
         include:
           - rdks_tag: "amd64"
+            goarch: "amd64"
             patch_arch: "x86_64"
             sdk_name: "openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64"
           - rdks_tag: "arm64v8"
+            goarch: "arm64"
             patch_arch: "aarch64_generic"
             sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
 
@@ -36,6 +38,11 @@ jobs:
         with:
           sdk_name: ${{ matrix.sdk_name }}
 
+      - name: Set up Go
+        uses: actions/setup-go@main
+        with:
+          go-version: 'stable'
+
       - name: Preparation before compilation
         id: get_version
         shell: bash
@@ -47,9 +54,11 @@ jobs:
           fi
           VERSION=$(grep -E "^PKG_VERSION[[:space:]]*:=" Makefile | sed -E 's/.*:=[[:space:]]*//' | tr -d '[:space:]')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          cd $GITHUB_WORKSPACE/${{ matrix.sdk_name }}/package/${{ env.project_name }}/root/etc/rustdesk
+          cd $GITHUB_WORKSPACE/${{ matrix.sdk_name }}/package/${{ env.project_name }}
+          CGO_ENABLED=0 ${{ matrix.goarch }} go build
+          cd root/etc/rustdesk
           rm DONOTREMOVE
-          wget -O rustdesk-server.zip https://github.com/rustdesk/rustdesk-server/releases/download/1.1.15/rustdesk-server-linux-${{ matrix.rdks_tag }}.zip
+          wget -O rustdesk-server.zip https://github.com/rustdesk/rustdesk-server/releases/download/latest/rustdesk-server-linux-${{ matrix.rdks_tag }}.zip
           unzip ./rustdesk-server.zip
           mv ./${{ matrix.rdks_tag }}/* ./
           rm -rf ./${{ matrix.rdks_tag }}
