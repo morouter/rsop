@@ -58,7 +58,7 @@ jobs:
           CGO_ENABLED=0 GOARCH=${{ matrix.goarch }} go build
           cd root/etc/rustdesk
           rm DONOTREMOVE
-          wget -O rustdesk-server.zip https://github.com/rustdesk/rustdesk-server/releases/download/latest/rustdesk-server-linux-${{ matrix.rdks_tag }}.zip
+          wget -O rustdesk-server.zip https://github.com/rustdesk/rustdesk-server/releases/latest/download/rustdesk-server-linux-${{ matrix.rdks_tag }}.zip
           unzip ./rustdesk-server.zip
           mv ./${{ matrix.rdks_tag }}/* ./
           rm -rf ./${{ matrix.rdks_tag }}
