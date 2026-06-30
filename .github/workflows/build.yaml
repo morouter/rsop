@@ -18,11 +18,11 @@ jobs:
           - rdks_tag: "amd64"
             goarch: "amd64"
             patch_arch: "x86_64"
-            sdk_name: "openwrt-sdk-x86-64_gcc-14.3.0_musl.Linux-x86_64"
+            sdk_name: "openwrt-sdk-x86-64_gcc-14.4.0_musl.Linux-x86_64"
           - rdks_tag: "arm64v8"
             goarch: "arm64"
             patch_arch: "aarch64_generic"
-            sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.3.0_musl.Linux-x86_64"
+            sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.4.0_musl.Linux-x86_64"
 
     steps:
       - name: Checkout
