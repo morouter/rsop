@@ -18,11 +18,11 @@ jobs:
           - rdks_tag: "amd64"
             goarch: "amd64"
             patch_arch: "x86_64"
-            sdk_name: "openwrt-sdk-x86-64_gcc-14.4.0_musl.Linux-x86_64"
+            sdk_arch: "x86-64"
           - rdks_tag: "arm64v8"
             goarch: "arm64"
             patch_arch: "aarch64_generic"
-            sdk_name: "openwrt-sdk-rockchip-armv8_gcc-14.4.0_musl.Linux-x86_64"
+            sdk_arch: "rockchip-armv8"
 
     steps:
       - name: Checkout
@@ -34,9 +34,10 @@ jobs:
         uses: mokanove/mokanove/actions/build-env@main
 
       - name: Prepare SDK
+        id: sdk
         uses: mokanove/mokanove/actions/prepare-sdk@main
         with:
-          sdk_name: ${{ matrix.sdk_name }}
+          sdk_arch: ${{ matrix.sdk_arch }}
 
       - name: Set up Go
         uses: actions/setup-go@main
@@ -47,14 +48,14 @@ jobs:
         id: get_version
         shell: bash
         run: |
-          mv ${{ env.project_name }} ${{ matrix.sdk_name }}/package/
-          cd ${{ matrix.sdk_name }}/package/${{ env.project_name }}
+          mv ${{ env.project_name }} ${{ steps.sdk.outputs.sdk_dir }}/package/
+          cd ${{ steps.sdk.outputs.sdk_dir }}/package/${{ env.project_name }}
           if [ "${{ matrix.patch_arch }}" != "x86_64" ]; then
             sed -i 's/x86_64/${{ matrix.patch_arch }}/g' ./Makefile
           fi
           VERSION=$(grep -E "^PKG_VERSION[[:space:]]*:=" Makefile | sed -E 's/.*:=[[:space:]]*//' | tr -d '[:space:]')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          cd $GITHUB_WORKSPACE/${{ matrix.sdk_name }}/package/${{ env.project_name }}
+          cd $GITHUB_WORKSPACE/${{ steps.sdk.outputs.sdk_dir }}/package/${{ env.project_name }}
           CGO_ENABLED=0 GOARCH=${{ matrix.goarch }} go build
           mv ./rsop root/etc/rustdesk/rsop
           cd root/etc/rustdesk
@@ -63,21 +64,18 @@ jobs:
           unzip ./rustdesk-server.zip
           mv ./${{ matrix.rdks_tag }}/* ./
           rm -rf ./${{ matrix.rdks_tag }} ./rustdesk-server.zip
-          chmod +x ./hbbr
-          chmod +x ./hbbs
-          chmod +x ./rustdesk-utils
-          chmod +x ./rsop
+          chmod +x ./hbbr ./hbbs ./rustdesk-utils ./rsop
 
       - name: Build!
         shell: bash
         run: |
-          cd ${{ matrix.sdk_name }}
+          cd ${{ steps.sdk.outputs.sdk_dir }}
           make package/${{ env.project_name }}/compile V=s -j$(nproc)
 
       - name: Rename compilation files
         shell: bash
         run: |
-          mv ${{ matrix.sdk_name }}/bin/packages/*/base/*.apk rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
+          mv ${{ steps.sdk.outputs.sdk_dir }}/bin/packages/*/base/*.apk rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
 
       - name: Release
         uses: softprops/action-gh-release@master

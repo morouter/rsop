@@ -1,8 +1,6 @@
 package main
 
-import (
-	"net/http"
-)
+import "net/http"
 
 func main() {
 	http.ListenAndServe(":21114", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
