@@ -1,0 +1,62 @@
+name : Just like my liquor
+
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    name: Build Always 200OK Server for ${{ matrix.dickname }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tag: ""
+            dickname: "amd64"
+          - tag: "GOARCH=arm64"
+            dickname: "arm64"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+        with:
+          path: useless/
+
+      - name: Set up Go
+        uses: actions/setup-go@main
+        with:
+          go-version: 'stable'
+
+      - name: Build!
+        shell: bash
+        run: |
+          git clone https://github.com/morouter/rsop.git
+          git checkout Always200Server
+          ${{ matrix.tag }} go build
+          mv rsop rsop-${{ matrix.dickname }}
+
+      - name: Release
+        uses: softprops/action-gh-release@master
+        with:
+          tag_name: Always 200OK Server
+          files: rsop-${{ matrix.dickname }}
+          body: |
+            # This is an always 200OK Server
+            Made use Golang `net/http` lib
+            ## Uses
+            When you using `Rustdesk-server`, The rustdesk client sometimes will be sent a post to server:21114
+
+            But if you not bought `Rustdesk-Server-Pro`, It maybe **TimeOut Error**.
+
+            So this is a fake server that denied this problem.
+
+            It run an always OK Server to Fuck this error.
+            ## Made
+            People: MoAEIOU, Claude
+
+            Language: Go 1.26.5
+            ## License
+            AGPL-v3 or later. yeah
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
