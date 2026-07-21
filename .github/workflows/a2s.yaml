@@ -40,7 +40,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@master
         with:
-          tag_name: Always 200OK Server
+          tag_name: Always-200OK-Server
           files: rsop/rsop-${{ matrix.dickname }}
           body: |
             # This is an always 200OK Server
