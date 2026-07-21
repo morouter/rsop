@@ -1,89 +1,62 @@
-name : I go to Comicon, guns, and thrash metal shows
+name : Just like my liquor
 
 on:
-  push:
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
   build:
-    name: Build for ${{ matrix.patch_arch }}
+    name: Build Always 200OK Server for ${{ matrix.dickname }}
     runs-on: ubuntu-latest
-    env:
-      project_name: "rsop"
     strategy:
       fail-fast: false
       matrix:
         include:
-          - rdks_tag: "amd64"
-            goarch: "amd64"
-            patch_arch: "x86_64"
-            sdk_arch: "x86-64"
-          - rdks_tag: "arm64v8"
-            goarch: "arm64"
-            patch_arch: "aarch64_generic"
-            sdk_arch: "rockchip-armv8"
+          - tag: ""
+            dickname: "amd64"
+          - tag: "GOARCH=arm64"
+            dickname: "arm64"
 
     steps:
       - name: Checkout
         uses: actions/checkout@main
         with:
-          path: ${{ env.project_name }}
-
-      - name: Preparing build environment
-        uses: moaeiou/moaeiou/actions/build-env@main
-
-      - name: Prepare SDK
-        id: sdk
-        uses: moaeiou/moaeiou/actions/prepare-sdk@main
-        with:
-          sdk_arch: ${{ matrix.sdk_arch }}
+          path: useless/
 
       - name: Set up Go
         uses: actions/setup-go@main
         with:
           go-version: 'stable'
 
-      - name: Preparation before compilation
-        id: get_version
-        shell: bash
-        run: |
-          mv ${{ env.project_name }} ${{ steps.sdk.outputs.sdk_dir }}/package/
-          cd ${{ steps.sdk.outputs.sdk_dir }}/package/${{ env.project_name }}
-          if [ "${{ matrix.patch_arch }}" != "x86_64" ]; then
-            sed -i 's/x86_64/${{ matrix.patch_arch }}/g' ./Makefile
-          fi
-          VERSION=$(grep -E "^PKG_VERSION[[:space:]]*:=" Makefile | sed -E 's/.*:=[[:space:]]*//' | tr -d '[:space:]')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          cd $GITHUB_WORKSPACE/${{ steps.sdk.outputs.sdk_dir }}/package/${{ env.project_name }}
-          CGO_ENABLED=0 GOARCH=${{ matrix.goarch }} go build
-          mv ./rsop root/etc/rustdesk/rsop
-          cd root/etc/rustdesk
-          rm DONOTREMOVE
-          wget -O rustdesk-server.zip https://github.com/rustdesk/rustdesk-server/releases/latest/download/rustdesk-server-linux-${{ matrix.rdks_tag }}.zip
-          unzip ./rustdesk-server.zip
-          mv ./${{ matrix.rdks_tag }}/* ./
-          rm -rf ./${{ matrix.rdks_tag }} ./rustdesk-server.zip
-          chmod +x ./hbbr ./hbbs ./rustdesk-utils ./rsop
-
       - name: Build!
         shell: bash
         run: |
-          cd ${{ steps.sdk.outputs.sdk_dir }}
-          make package/${{ env.project_name }}/compile V=s -j$(nproc)
-
-      - name: Rename compilation files
-        shell: bash
-        run: |
-          mv ${{ steps.sdk.outputs.sdk_dir }}/bin/packages/*/base/*.apk rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
+          git clone https://github.com/morouter/rsop.git
+          git checkout Always200Server
+          ${{ matrix.tag }} go build
+          mv rsop rsop-${{ matrix.dickname }}
 
       - name: Release
         uses: softprops/action-gh-release@master
         with:
-          tag_name: V${{ steps.get_version.outputs.version }}
-          files: rsop-${{ steps.get_version.outputs.version }}-${{ matrix.patch_arch }}.apk
+          tag_name: Always 200OK Server
+          files: rsop-${{ matrix.dickname }}
           body: |
-            # 📝 Release Note
-            - Fixes and improvements
+            # This is an always 200OK Server
+            Made use Golang `net/http` lib
+            ## Uses
+            When you using `Rustdesk-server`, The rustdesk client sometimes will be sent a post to server:21114
+
+            But if you not bought `Rustdesk-Server-Pro`, It maybe **TimeOut Error**.
+
+            So this is a fake server that denied this problem.
+
+            It run an always OK Server to Fuck this error.
+            ## Made
+            People: MoAEIOU, Claude
+
+            Language: Go 1.26.5
+            ## License
+            AGPL-v3 or later. yeah
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
