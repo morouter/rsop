@@ -1,7 +1,6 @@
 name : I go to Comicon, guns, and thrash metal shows
 
 on:
-  push:
   workflow_dispatch:
 permissions:
   contents: write

@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
+        with:
+          path: useless/
 
       - name: Set up Go
         uses: actions/setup-go@main
@@ -29,6 +31,9 @@ jobs:
       - name: Build!
         shell: bash
         run: |
+          git clone https://github.com/morouter/rsop.git
+          cd rsop
+          git checkout Always200Server
           ${{ matrix.tag }} go build
           mv rsop rsop-${{ matrix.dickname }}
 
@@ -36,7 +41,7 @@ jobs:
         uses: softprops/action-gh-release@master
         with:
           tag_name: Always 200OK Server
-          files: rsop-${{ matrix.dickname }}
+          files: rsop/rsop-${{ matrix.dickname }}
           body: |
             # This is an always 200OK Server
             Made use Golang `net/http` lib
